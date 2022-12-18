@@ -1,8 +1,43 @@
 import { createContext, useEffect, useState } from "react";
 
+import { io } from 'socket.io-client';
+
+const socket = io('http://edu.project.etherial.fr');
+
 export const StoreContext = createContext()
 
 export function StoreProvider(props) {
+
+    const [personalCoordinates, setPersonalCoordinates] = useState({
+        latitude: 48.50,
+        longitude: 2.20,
+    })
+
+    const [positions, setPositions] = useState({});
+
+    const options = {
+        enableHighAccuracy: true,
+        timeout: 500,
+        maximumAge: 0,
+    };
+
+    function success(pos) {
+        const coords = pos.coords;
+
+        socket.emit('update_position', {
+            point_lat: pos.coords.latitude,
+            point_lon: pos.coords.longitude,
+        });
+
+        setPersonalCoordinates({
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+        })
+    }
+
+    function errors(err) {
+        console.warn(`ERROR(${err.code}): ${err.message}`);
+    }
 
     const [token, setToken] = useState(
         localStorage.getItem('token') ? localStorage.getItem('token') : null
@@ -10,7 +45,6 @@ export function StoreProvider(props) {
 
     const [pageArray, setPageArray] = useState([])
     const [offset, setOffset] = useState(0)
-
 
     const [articles, setArticles] = useState([])
     const [maxArticles, setMaxArticles] = useState(0);
@@ -45,6 +79,16 @@ export function StoreProvider(props) {
 
         getAllArticles();
         getAllCategories();
+
+        socket.on('connect', () => {
+            socket.emit('auth', localStorage.getItem('token'));
+        });
+
+        socket.on('positions', ({ data }) => {
+            setPositions({ ...positions, data });
+        });
+
+        navigator.geolocation.getCurrentPosition(success, errors, options);
 
     }, [])
 
@@ -84,7 +128,9 @@ export function StoreProvider(props) {
             offset: offset, setOffset: setOffset,
             token: token, setToken: setToken,
             categories: categories, setCategories: setCategories,
-            currentCategory: currentCategory, setCurrentCategory: setCurrentCategory
+            currentCategory: currentCategory, setCurrentCategory: setCurrentCategory,
+            personalCoordinates: personalCoordinates, setPersonalCoordinates: setPersonalCoordinates,
+            positions: positions, setPositions: setPositions,
         }}>
             {props.children}
         </StoreContext.Provider>

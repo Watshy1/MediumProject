@@ -6,6 +6,7 @@ import Article from './Screens/Article';
 import Create from './Screens/ArticleCreate';
 import Register from './Screens/Register';
 import Login from './Screens/Login';
+import Map from './Components/Map';
 
 import Nav from './Components/Nav';
 
@@ -24,7 +25,9 @@ function App() {
                         <Route path="/articles/create" element={<Create />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/login" element={<Login />} />
+                        <Route path="/map" />
                     </Routes>
+                    <Map />
                 </div>
             </BrowserRouter>
         </StoreProvider>

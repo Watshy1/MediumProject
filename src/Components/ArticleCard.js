@@ -7,9 +7,13 @@ export default function ArticleCard(props) {
     return (
         <div className="rounded overflow-hidden shadow-lg bg-white mb-4 border-2 border-gray-200">
             <div className="px-6 py-4">
-                <div className="font-bold text-xl mb-2">{ props.article.title }</div>
+                <div className="flex gap-2">
+                    <h2>{props.article.User.firstname}</h2>
+                    <h2>{props.article.User.lastname}</h2>
+                </div>
+                <h2 className="font-bold text-xl mb-2">{props.article.title}</h2>
                 <p className="text-gray-700 text-base">
-                    { props.article.content }
+                    {props.article.content}
                 </p>
                 <button onClick={() => {
                     navigate(`/articles/${props.article.id}`)
